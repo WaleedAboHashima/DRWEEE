@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@vs-org/authenticator": "^0.0.8",
+    "@vs-org/base-32": "^0.0.2",
     "bcrypt": "^5.1.1",
     "controllers": "^0.0.2",
     "cors": "^2.8.5",
