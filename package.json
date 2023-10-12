@@ -16,6 +16,7 @@
     "@vs-org/authenticator": "^0.0.8",
     "@vs-org/base-32": "^0.0.2",
     "@vs-org/logger": "^0.0.2",
+    "@vs-org/random": "^0.0.6",
     "bcrypt": "^5.1.1",
     "controllers": "^0.0.2",
     "cors": "^2.8.5",
