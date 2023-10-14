@@ -7,18 +7,18 @@ exports.JWTGuard = (...allowedRoles) => {
       req.headers.authorization.startsWith("Bearer") &&
       req.headers.authorization.split(" ")[1];
     if (!token)
-      return res.status(401).json({ success: false, message: "Token Required" });
+      return res.status(200).json({ success: false, message: "Token Required" });
     else {
       if (process.env.TOKEN) {
         verify(token, process.env.TOKEN, { complete: true }, (err, decoded) => {
           if (!decoded)
             return res
-              .status(401)
+              .status(200)
               .json({ success: false, message: "Invalid Token" });
           const { id, role } = decoded.payload;
           if (allowedRoles.length) {
             if (!allowedRoles.includes(role))
-              return res.status(401).json({
+              return res.status(200).json({
                 success: false,
                 message: `Only ${allowedRoles.join(
                   "-"
@@ -29,7 +29,7 @@ exports.JWTGuard = (...allowedRoles) => {
           next();
         });
       } else {
-        res.status(500).json({ success: false, message: "Token is required" });
+        res.status(200).json({ success: false, message: "Token is required" });
       }
     }
   };
