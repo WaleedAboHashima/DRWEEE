@@ -5,7 +5,6 @@ const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const { MainRoutes } = require("./routes");
-
 /* Coloring */
 morgan.token("coloredStatus", (req, res) => {
   const status = res.statusCode;
@@ -30,8 +29,8 @@ morgan.token("coloredStatus", (req, res) => {
 });
 
 /* Cofnigiration */
-dotenv.config();
 const app = express();
+dotenv.config();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
