@@ -8,9 +8,12 @@ const {
   GetVideo,
   UpdateProfile,
   SubmitReports,
-  GetCategories,
-  GetProductsInCategory,
-  AddProductToCategory,
+  GetCart,
+  AddToCart,
+  GetProducts,
+  DeleteFromCart,
+  DeleteCart,
+  AddOrder,
 } = require("../../controllers/User");
 
 router.post("/changepwd", ChangePassword);
@@ -19,8 +22,10 @@ router.get("/rules", GetRules);
 router.get('/video', GetVideo);
 router.put('/profile/update', UpdateProfile);
 router.post('/report', SubmitReports)
-router.get('/categories', GetCategories)
-router.get('/:catId/products', GetProductsInCategory);
-router.post('/new/product/:catId', ImgUploader.fields([{name: "image", maxCount: 1}]), AddProductToCategory)
-
+router.get('/products', GetProducts)
+router.post('/cart/add/:prodId', AddToCart)
+router.get('/cart', GetCart)
+router.delete('/cart/:cartId/product/:prodId', DeleteFromCart);
+router.delete('/remove/cart/:cartId', DeleteCart)
+router.post('/order', AddOrder);
 module.exports = router;

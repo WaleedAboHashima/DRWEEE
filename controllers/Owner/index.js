@@ -2,11 +2,9 @@ const { User } = require("../../models/User");
 const expressAsyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const { Rules } = require("../../models/Rule/index");
-const { Categories } = require("../../models/Category");
-const { Product } = require("../../models/Product");
-require('dotenv').config();
+const { Products } = require("../../models/Products");
+require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -100,23 +98,22 @@ exports.GetAllUsers = expressAsyncHandler(async (req, res) => {
   }
 });
 
-exports.AddCategory = expressAsyncHandler(async (req, res) => {
-  const { name, points } = req.body;
+exports.AddProduct = expressAsyncHandler(async (req, res) => {
+  const { name, points, description, price } = req.body;
   const { image } = req.files;
   try {
-    const duplicate = await Categories.findOne({ Name: name });
-    if (duplicate)
-      return res.json(
-        { success: false, message: "Duplicated Category Name" },
-        409
-      );
-    else {
-      const imageUpload = (await cloudinary.uploader.upload(image[0].path)).secure_url;
-      await Categories.create({Image: imageUpload, Name: name, Points: points }).then(() => {
-        res.json({ success: true, message: "Category Added" }, 201);
-      });
-    }
+    const imageUpload = (await cloudinary.uploader.upload(image[0].path))
+      .secure_url;
+    await Products.create({
+      Image: imageUpload,
+      Name: name,
+      Points: points,
+      Price: price,
+      Description: description
+    }).then(() => {
+      res.status(201).json({ success: true, message: "Product Added" });
+    });
   } catch (err) {
-    res.json({ success: false, message: err.message }, 500);
+    res.status(500).json({ success: false, message: err.message });
   }
 });
