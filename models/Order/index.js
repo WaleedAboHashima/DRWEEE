@@ -7,8 +7,12 @@ const orderSchema = new mongoose.Schema({
       Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
       100000000000,
   },
-  TotalPoints: {},
-  TotalPrice: {},
+  User: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users'
+  },
+  TotalPoints: { type: Number },
+  TotalPrice: { type: Number },
   Status: {
     type: String,
     enum: ["Pending", "Delivered", "On the way"],

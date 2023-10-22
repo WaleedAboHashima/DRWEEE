@@ -5,6 +5,7 @@ const { Reports } = require("../../models/Reports/index");
 const { Rules } = require("../../models/Rule/index");
 const { Products } = require("../../models/Products");
 const { Carts } = require("../../models/Cart");
+const { Orders } = require("../../models/Order");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 
@@ -218,7 +219,7 @@ exports.DeleteFromCart = expressAsyncHandler(async (req, res) => {
       if (!cart)
         return res
           .status(200)
-          .json({ success: false, message: "Cart Not Found"});
+          .json({ success: false, message: "Cart Not Found" });
       else {
         const prodIndex = cart.Products.findIndex(
           (product) => product._id.toString() === prodId
@@ -256,7 +257,7 @@ exports.DeleteFromCart = expressAsyncHandler(async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({success: false, message: err.message})
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
@@ -281,25 +282,68 @@ exports.GetCart = expressAsyncHandler(async (req, res) => {
 });
 
 exports.DeleteCart = expressAsyncHandler(async (req, res) => {
-  const {cartId} = req.params;
+  const { cartId } = req.params;
   try {
-    await Carts.findByIdAndDelete(cartId).then(cart => {
-      if (!cart) res.status(200).json({success: false, message: 'Cart not found'});
+    await Carts.findByIdAndDelete(cartId).then((cart) => {
+      if (!cart)
+        res.status(200).json({ success: false, message: "Cart not found" });
       else {
-        res.status(200).json({success: true, message: 'Cart Deleted Successfully'})
+        res
+          .status(200)
+          .json({ success: true, message: "Cart Deleted Successfully" });
       }
-    })
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
-  catch(err) {
-    res.status(500).json({success: false, message: err.message})
-  }
-})
+});
 
 exports.AddOrder = expressAsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { cartId } = req.params;
   try {
-    
+    await Carts.findById(cartId).then(async (cart) => {
+      if (!cart)
+        res.status(200).json({ success: false, message: "Cart not found" });
+      else {
+        await Orders.create({
+          User: id,
+          Products: cart.Products,
+          TotalPoints: cart.totalPoints,
+          TotalPrice: cart.totalPrice,
+        }).then(async (order) => {
+          await Carts.findByIdAndDelete(cartId);
+          res
+            .status(200)
+            .json({ success: true, message: "Order added", order });
+        });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
-  catch (err) {
-    res.status(500).json({success: false, message: err.message});
+});
+
+exports.GetOrder = expressAsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    await Orders.find({ User: id })
+      .then((order) => {
+        if (!order)
+          return res
+            .status(200)
+            .json({ success: false, message: "No orders for this user" });
+        else {
+          res
+            .status(200)
+            .json({
+              success: true,
+              message: "Order retrieved successfully",
+              order,
+            });
+        }
+      });
+  } catch (err) {
+    res.status(500).json({success: false, message: err.message})
   }
 });
