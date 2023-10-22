@@ -15,6 +15,7 @@ const {
   DeleteCart,
   AddOrder,
   GetOrder,
+  DeleteOrder
 } = require("../../controllers/User");
 
 router.post("/changepwd", ChangePassword);
@@ -30,4 +31,5 @@ router.delete('/cart/:cartId/product/:prodId', DeleteFromCart);
 router.delete('/remove/cart/:cartId', DeleteCart)
 router.post('/order/:cartId', AddOrder);
 router.get('/order', GetOrder)
+router.delete('/order/:orderId', DeleteOrder)
 module.exports = router;

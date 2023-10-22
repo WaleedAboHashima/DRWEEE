@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { User } = require("../User");
 
 const orderSchema = new mongoose.Schema({
   OrderNo: {
@@ -7,9 +8,12 @@ const orderSchema = new mongoose.Schema({
       Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
       100000000000,
   },
-  User: {
+  Info: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Users'
+    ref: "Users",
+  },
+  User: {
+    type: Object,
   },
   TotalPoints: { type: Number },
   TotalPrice: { type: Number },

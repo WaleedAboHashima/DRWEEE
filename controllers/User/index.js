@@ -299,15 +299,21 @@ exports.DeleteCart = expressAsyncHandler(async (req, res) => {
 });
 
 exports.AddOrder = expressAsyncHandler(async (req, res) => {
-  const { id } = req.user;
   const { cartId } = req.params;
+  const { name, phone, location } = req.body;
+  const { id } = req.user;
   try {
     await Carts.findById(cartId).then(async (cart) => {
       if (!cart)
         res.status(200).json({ success: false, message: "Cart not found" });
       else {
         await Orders.create({
-          User: id,
+          Info: id,
+          User: {
+            Name: name,
+            Phone: phone,
+            Location: { lat: location.lat, lng: location.lng },
+          },
           Products: cart.Products,
           TotalPoints: cart.totalPoints,
           TotalPrice: cart.totalPrice,
@@ -327,23 +333,31 @@ exports.AddOrder = expressAsyncHandler(async (req, res) => {
 exports.GetOrder = expressAsyncHandler(async (req, res) => {
   const { id } = req.user;
   try {
-    await Orders.find({ User: id })
-      .then((order) => {
-        if (!order)
-          return res
-            .status(200)
-            .json({ success: false, message: "No orders for this user" });
-        else {
-          res
-            .status(200)
-            .json({
-              success: true,
-              message: "Order retrieved successfully",
-              order,
-            });
-        }
-      });
+    await Orders.find({ Info: id }).then((order) => {
+      if (!order)
+        return res
+          .status(200)
+          .json({ success: false, message: "No orders for this user" });
+      else {
+        res.status(200).json({
+          success: true,
+          message: "Order retrieved successfully",
+          order,
+        });
+      }
+    });
   } catch (err) {
-    res.status(500).json({success: false, message: err.message})
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.DeleteOrder = expressAsyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    await Orders.findByIdAndDelete(orderId).then(() => {
+      res.status(200).json({ success: true, message: "Order Deleted" });
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
