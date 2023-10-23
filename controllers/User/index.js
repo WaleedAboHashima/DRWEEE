@@ -268,7 +268,7 @@ exports.GetCart = expressAsyncHandler(async (req, res) => {
     if (!foundCart)
       return res
         .status(200)
-        .json({ success: false, message: "Cart Not Found" });
+        .json({ success: true, message: "Cart Not Found", cart: {Products: []} });
     else {
       res.status(200).json({
         success: true,
