@@ -17,6 +17,7 @@
     "@vs-org/base-32": "^0.0.2",
     "@vs-org/logger": "^0.0.2",
     "@vs-org/random": "^0.0.6",
+    "axios": "^1.5.1",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.0",
     "controllers": "^0.0.2",

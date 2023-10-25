@@ -25,6 +25,10 @@ const userScehma = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  permission: {
+    type: String,
+    enum: ["Admin", "SuperVisor", "CityAdmin"]
+  }
 });
 
 exports.User = mongoose.model("Users", userScehma);

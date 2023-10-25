@@ -4,7 +4,9 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const axios = require("axios").default;
 const { MainRoutes } = require("./routes");
+const { CountriesCities } = require("./models/CountriesAndCities");
 /* Coloring */
 morgan.token("coloredStatus", (req, res) => {
   const status = res.statusCode;
@@ -41,6 +43,26 @@ app.use(
 );
 
 MainRoutes(app);
+
+const CountriesCitiesCheck = async (req, res) => {
+  try {
+    const cc = await CountriesCities.findOne({});
+    if (cc) {
+      console.log(`Countries already in db all good`);
+    } else {
+      const res = await axios.get(
+        "https://countriesnow.space/api/v0.1/countries"
+      );
+      await CountriesCities.create({
+        countries: res.data.data
+      }).then(() => console.log(`Coutries added successfully`))
+    }
+  } catch (err) {
+    console.log(`Error with cc function: ${err.message}`);
+  }
+};
+
+CountriesCitiesCheck();
 
 if (process.env.DB_URL) {
   mongoose

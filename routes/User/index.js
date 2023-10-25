@@ -15,13 +15,13 @@ const {
   DeleteCart,
   AddOrder,
   GetOrder,
-  DeleteOrder
+  DeleteOrder,
+  GetInfo
 } = require("../../controllers/User");
 
 router.post("/changepwd", ChangePassword);
 router.get("/profile", GetProfile);
-router.get("/rules", GetRules);
-router.get('/video', GetVideo);
+router.get("/countries-cities", GetRules);
 router.put('/profile/update', UpdateProfile);
 router.post('/report', SubmitReports)
 router.get('/products', GetProducts)
@@ -32,4 +32,5 @@ router.delete('/remove/cart/:cartId', DeleteCart)
 router.post('/order/:cartId', AddOrder);
 router.get('/order', GetOrder)
 router.delete('/order/:orderId', DeleteOrder)
+router.get('/home', GetInfo)
 module.exports = router;

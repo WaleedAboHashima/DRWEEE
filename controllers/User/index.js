@@ -6,6 +6,7 @@ const { Rules } = require("../../models/Rule/index");
 const { Products } = require("../../models/Products");
 const { Carts } = require("../../models/Cart");
 const { Orders } = require("../../models/Order");
+const { json } = require("express");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 
@@ -73,23 +74,11 @@ exports.GetCountriesAndCities = expressAsyncHandler(async (req, res) => {
 
 exports.GetRules = expressAsyncHandler(async (req, res) => {
   try {
-    await Rules.find({}).then((rules) => {
-      delete rules[0]._doc.Video.videoData;
+    await Rules.findOne({ type: "countries" }).then((rules) => {
+      delete rules._doc.Home;
       res
         .status(200)
-        .json({ success: true, message: "Rules retrieved", rules });
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-exports.GetVideo = expressAsyncHandler(async (req, res) => {
-  try {
-    await Rules.findById("653087ba5121edfdc7565fa8").then((rule) => {
-      res.set("Content-Type", rule.Video.mimeType);
-      const video = rule.Video.videoData;
-      res.status(200).json({ success: true, message: "Data Retrieved", video });
+        .json({ success: true, message: "Countries retrieved", rules });
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -266,9 +255,11 @@ exports.GetCart = expressAsyncHandler(async (req, res) => {
   try {
     const foundCart = await Carts.findOne({ User: id });
     if (!foundCart)
-      return res
-        .status(200)
-        .json({ success: true, message: "Cart Not Found", cart: {Products: []} });
+      return res.status(200).json({
+        success: true,
+        message: "Cart Not Found",
+        cart: { Products: [] },
+      });
     else {
       res.status(200).json({
         success: true,
@@ -356,6 +347,19 @@ exports.DeleteOrder = expressAsyncHandler(async (req, res) => {
   try {
     await Orders.findByIdAndDelete(orderId).then(() => {
       res.status(200).json({ success: true, message: "Order Deleted" });
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.GetInfo = expressAsyncHandler(async (req, res) => {
+  try {
+    await Rules.findOne({ type: "home" }).then((rule) => {
+      if (!rule) return res.status(200).json({ success: true, data: {} });
+      else {
+        res.status(200).json({ success: true, data: rule.Home });
+      }
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

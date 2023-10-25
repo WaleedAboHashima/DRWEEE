@@ -20,6 +20,7 @@ const orderSchema = new mongoose.Schema({
   Status: {
     type: String,
     enum: ["Pending", "Delivered", "On the way"],
+    default: "Pending"
   },
   Products: [],
 });
