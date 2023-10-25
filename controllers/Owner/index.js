@@ -2,6 +2,7 @@ const { User } = require("../../models/User");
 const expressAsyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const { Rules } = require("../../models/Rule/index");
+const { Orders } = require("../../models/Order");
 const { Products } = require("../../models/Products");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
@@ -197,4 +198,22 @@ exports.AddInfo = expressAsyncHandler(async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+});
+
+exports.GetAllProducts = expressAsyncHandler(async (req, res) => {
+  try {
+    await Products.find({}).then((products) => {
+      res.status(200).json({ success: true, products });
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.GetAllOrders = expressAsyncHandler(async (req, res) => {
+  try {
+    await Orders.find({}).then((orders) => {
+      res.status(200).json({ success: true, orders });
+    });
+  } catch (err) {}
 });

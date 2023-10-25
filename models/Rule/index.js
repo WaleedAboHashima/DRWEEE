@@ -12,15 +12,14 @@ const ruleSchema = new mongoose.Schema({
   //   videoData: Buffer,
   //   mimeType: String,
   // },
-  Countries: [
-    {
-      type: Array,
-      Name: String,
-      Cities: [],
-      Governments: [],
-      Flag: String,
-    },
-  ],
+  Countries: {
+    type: Array,
+    Name: String,
+    Cities: [],
+    Governments: [],
+    Flag: String,
+  },
+
   Home: {
     text: { type: String },
     images: [],
