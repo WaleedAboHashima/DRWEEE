@@ -108,15 +108,19 @@ exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
             .status(409)
             .json({ success: false, message: "City Already Exists" });
         else {
-          existingCountry.Cities.push(city);
-          existingCountry.Governments.push(government);
+          country && existingCountry.Cities.push(city);
+          government && existingCountry.Governments.push(government);
           await rule.save();
           res
             .status(200)
             .json({ success: true, message: "City & Government Added", rule });
         }
       } else {
-        rule.Countries.push({ Name: country, Cities: [city] });
+        rule.Countries.push({
+          Name: country,
+          Cities: [city],
+          Governments: [government],
+        });
         await rule.save();
         res
           .status(200)
@@ -216,4 +220,17 @@ exports.GetAllOrders = expressAsyncHandler(async (req, res) => {
       res.status(200).json({ success: true, orders });
     });
   } catch (err) {}
+});
+
+exports.DeleteUser = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    await User.findByIdAndDelete(id).then(
+      res
+        .status(200)
+        .json({ success: true, message: "User deleted successfully" })
+    );
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });

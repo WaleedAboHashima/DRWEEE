@@ -3,7 +3,9 @@ const { User } = require("../../models/User");
 const bcrypt = require("bcrypt");
 const { CountriesCities } = require("../../models/CountriesAndCities");
 const { Reports } = require("../../models/Reports");
-const {Orders} = require('../../models/Order');
+const { Orders } = require("../../models/Order");
+const { Rules } = require("../../models/Rule");
+const { Products } = require("../../models/Products");
 exports.AddUser = expressAsyncHandler(async (req, res) => {
   const { fullName, email, phone, password, permission, role } = req.body;
   try {
@@ -46,7 +48,7 @@ exports.GetAllCountries = expressAsyncHandler(async (req, res) => {
 
 exports.GetAllReports = expressAsyncHandler(async (req, res) => {
   try {
-    await Reports.find({}).then(reports => {
+    await Reports.find({}).then((reports) => {
       res.status(200).json({ success: true, reports });
     });
   } catch (err) {}
@@ -54,11 +56,34 @@ exports.GetAllReports = expressAsyncHandler(async (req, res) => {
 
 exports.GetAllOrders = expressAsyncHandler(async (req, res) => {
   try {
-    await Orders.find({}).then(orders => {
-      res.status(200).json({ success: true, orders});
-    })
+    await Orders.find({}).then((orders) => {
+      res.status(200).json({ success: true, orders });
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
-  catch (err) {
-    res.status(500).json({success: false, message: err.message})
+});
+
+exports.GetRules = expressAsyncHandler(async (req, res) => {
+  try {
+    await Rules.findOne({ type: "countries" }).then((rules) => {
+      delete rules._doc.Home;
+      res
+        .status(200)
+        .json({ success: true, message: "Countries retrieved", rules });
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
-})
+});
+
+exports.DeleteProduct = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Products.findByIdAndDelete(id).then(
+      res.status(200).json({ success: true, message: "Product Deleted" })
+    );
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});

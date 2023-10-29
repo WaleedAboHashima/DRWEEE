@@ -21,7 +21,6 @@ const {
 
 router.post("/changepwd", ChangePassword);
 router.get("/profile", GetProfile);
-router.get("/countries-cities", GetRules);
 router.put('/profile/update', UpdateProfile);
 router.post('/report', SubmitReports)
 router.get('/products', GetProducts)

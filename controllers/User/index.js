@@ -72,19 +72,6 @@ exports.GetCountriesAndCities = expressAsyncHandler(async (req, res) => {
   } catch (err) {}
 });
 
-exports.GetRules = expressAsyncHandler(async (req, res) => {
-  try {
-    await Rules.findOne({ type: "countries" }).then((rules) => {
-      delete rules._doc.Home;
-      res
-        .status(200)
-        .json({ success: true, message: "Countries retrieved", rules });
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
 exports.UpdateProfile = expressAsyncHandler(async (req, res) => {
   const id = req.user.id;
   const { name, phone, email } = req.body;
