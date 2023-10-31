@@ -6,8 +6,31 @@ const { Reports } = require("../../models/Reports");
 const { Orders } = require("../../models/Order");
 const { Rules } = require("../../models/Rule");
 const { Products } = require("../../models/Products");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
+
 exports.AddUser = expressAsyncHandler(async (req, res) => {
-  const { fullName, email, phone, password, permission, role } = req.body;
+  const {
+    fullName,
+    email,
+    phone,
+    password,
+    permission,
+    role,
+    adminId,
+    city,
+    country,
+    government,
+  } = req.body;
+  if (!fullName || !email || !phone || !password)
+    return res
+      .status(403)
+      .json({ success: false, message: "All Fields Are Required" });
   try {
     await User.findOne({ email }).then(async (user) => {
       if (user)
@@ -16,19 +39,58 @@ exports.AddUser = expressAsyncHandler(async (req, res) => {
           .json({ success: false, message: "User already exists" });
       else {
         const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({
-          fullName,
-          email,
-          phone,
-          password: hashedPassword,
-          role,
-          permission,
-        }).then((newUser) => {
-          delete newUser._doc.password;
-          res
-            .status(200)
-            .json({ success: true, message: "User Created", newUser });
-        });
+        switch (role) {
+          case "CityAdmin":
+            await User.create({
+              fullName,
+              email,
+              phone,
+              password: hashedPassword,
+              role,
+              City: city,
+              Admin: adminId,
+              permission,
+            }).then((newUser) => {
+              delete newUser._doc.password;
+              res
+                .status(200)
+                .json({ success: true, message: "User Created", newUser });
+            });
+            break;
+          case "SuperVisor":
+            await User.create({
+              fullName,
+              email,
+              phone,
+              password: hashedPassword,
+              role,
+              Government: government,
+              Admin: adminId,
+              permission,
+            }).then((newUser) => {
+              delete newUser._doc.password;
+              res
+                .status(200)
+                .json({ success: true, message: "User Created", newUser });
+            });
+            break;
+          default:
+            await User.create({
+              fullName,
+              email,
+              phone,
+              password: hashedPassword,
+              role,
+              Country: country,
+              permission,
+            }).then((newUser) => {
+              delete newUser._doc.password;
+              res
+                .status(200)
+                .json({ success: true, message: "User Created", newUser });
+            });
+            break;
+        }
       }
     });
   } catch (err) {
@@ -83,6 +145,62 @@ exports.DeleteProduct = expressAsyncHandler(async (req, res) => {
     await Products.findByIdAndDelete(id).then(
       res.status(200).json({ success: true, message: "Product Deleted" })
     );
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.UpdateProduct = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, points, description, price } = req.body;
+  const { image } = req.files;
+  try {
+    const imageUpload = (await cloudinary.uploader.upload(image[0].path))
+      .secure_url;
+    await Products.findByIdAndUpdate(id, {
+      Image: imageUpload,
+      Name: name,
+      Points: points,
+      Price: price,
+      Description: description,
+    }).then((product) =>
+      res
+        .status(200)
+        .json({ success: true, message: "ProductUpdated", product })
+    );
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.EditUser = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { fullName, email, permission, city, country, government, phone } =
+    req.body;
+  try {
+    const duplicate = await User.findOne({ $or: [{ email }, { phone }] });
+    if (duplicate) {
+      res
+        .status(409)
+        .json({
+          success: false,
+          message: "User with this info already exists.",
+        });
+    } else {
+      await User.findByIdAndUpdate(id, {
+        fullName,
+        phone,
+        email,
+        permission,
+        City: city,
+        Country: country,
+        Government: government,
+      }).then(() => {
+        res
+          .status(200)
+          .json({ success: true, message: "User updated successfully" });
+      });
+    }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

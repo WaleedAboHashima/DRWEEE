@@ -6,6 +6,19 @@ const userScehma = new mongoose.Schema({
     required: true,
     min: 3,
   },
+  Admin: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
+  Country: {
+    type: String,
+  },
+  City: {
+    type: String,
+  },
+  Government: {
+    type: String,
+  },
   password: {
     type: "String",
     required: true,
@@ -17,7 +30,7 @@ const userScehma = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["Merchant", "User", "Admin", "SuperAdmin"],
+    enum: ["Merchant", "User", "Admin", "SuperVisor", "CityAdmin"],
     default: "User",
   },
   phone: {
@@ -27,8 +40,8 @@ const userScehma = new mongoose.Schema({
   },
   permission: {
     type: String,
-    enum: ["Admin", "SuperVisor", "CityAdmin"]
-  }
+    enum: ['AddAdmins', 'AddSuperVisors', 'AddCityAdmin', '']
+  },
 });
 
 exports.User = mongoose.model("Users", userScehma);
