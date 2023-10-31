@@ -19,10 +19,14 @@ const orderSchema = new mongoose.Schema({
   TotalPrice: { type: Number },
   Status: {
     type: String,
-    enum: ["Pending", "Delivered", "On the way"],
-    default: "Pending"
+    enum: ["Pending", "Delivered", "On the way", "Canceled"],
+    default: "Pending",
   },
   Products: [],
+  Archived: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 exports.Orders = mongoose.model("Orders", orderSchema);

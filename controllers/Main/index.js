@@ -180,12 +180,10 @@ exports.EditUser = expressAsyncHandler(async (req, res) => {
   try {
     const duplicate = await User.findOne({ $or: [{ email }, { phone }] });
     if (duplicate) {
-      res
-        .status(409)
-        .json({
-          success: false,
-          message: "User with this info already exists.",
-        });
+      res.status(409).json({
+        success: false,
+        message: "User with this info already exists.",
+      });
     } else {
       await User.findByIdAndUpdate(id, {
         fullName,
@@ -201,6 +199,33 @@ exports.EditUser = expressAsyncHandler(async (req, res) => {
           .json({ success: true, message: "User updated successfully" });
       });
     }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.ArchiveOrder = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Orders.findById(id).then(async (order) => {
+      order.Archived = !order.Archived;
+      await order.save();
+      res.status(200).json({ success: true, message: "Order Archived" });
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.EditStatus = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    await Orders.findById(id).then(async (order) => {
+      order.Status = status;
+      await order.save();
+      res.status(200).json({ success: true, message: "Order Status changed" });
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
