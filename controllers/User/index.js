@@ -278,7 +278,7 @@ exports.DeleteCart = expressAsyncHandler(async (req, res) => {
 
 exports.AddOrder = expressAsyncHandler(async (req, res) => {
   const { cartId } = req.params;
-  const { name, phone, location } = req.body;
+  const { name, phone, location, address } = req.body;
   const { id } = req.user;
   try {
     await Carts.findById(cartId).then(async (cart) => {
@@ -291,6 +291,7 @@ exports.AddOrder = expressAsyncHandler(async (req, res) => {
             Name: name,
             Phone: phone,
             Location: { lat: location.lat, lng: location.lng },
+            Address: address
           },
           Products: cart.Products,
           TotalPoints: cart.totalPoints,
