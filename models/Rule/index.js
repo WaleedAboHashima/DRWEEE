@@ -23,7 +23,7 @@ const ruleSchema = new mongoose.Schema({
   Home: {
     text: { type: String },
     images: [],
-    Video: { type: String },
+    video: { type: String },
   },
 });
 

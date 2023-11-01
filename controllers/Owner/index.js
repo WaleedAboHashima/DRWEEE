@@ -38,100 +38,6 @@ cloudinary.config({
 //   }
 // });
 
-exports.AddVideo = expressAsyncHandler(async (req, res) => {
-  const { url } = req.body;
-  try {
-    const rule = await Rules.findOne({ type: "home" });
-    if (!rule) {
-      const newHome = new Rules({
-        type: "home",
-        Home: {
-          Video: url,
-        },
-      });
-      await newHome.save();
-      res.status(201).json({
-        success: true,
-        message: "Video added successfully",
-        data: newHome.Home.Video,
-      });
-    } else {
-      rule.Home.Video = url;
-      await rule.save();
-      res.status(201).json({
-        success: true,
-        message: "Video Updated successfully",
-        video: rule.Home.Video,
-      });
-    }
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
-//   const { country, city, government } = req.body;
-//   try {
-//     let rule = await Rules.findOne({ type: "countries" });
-//     if (!rule) {
-//       const newCountry = new Rules({
-//         type: "countries",
-//         Countries: [
-//           {
-//             Name: country,
-//             Cities: [city],
-//             Governments: [government],
-//           },
-//         ],
-//       });
-//       rule = await newCountry.save();
-//       res
-//         .status(200)
-//         .json({ success: true, message: "Country Added", Results: rule });
-//     } else {
-//       const existingCountry = rule.Countries.find(
-//         (countryRule) => countryRule.Name === country
-//       );
-//       if (existingCountry) {
-//         const existingCity = existingCountry.Cities.find(
-//           (cityRule) => cityRule === city
-//         );
-//         const existingGovernments = existingCountry.Governments.find(
-//           (govRule) => govRule === government
-//         );
-//         if (existingGovernments) {
-//           return res
-//             .status(409)
-//             .json({ success: false, message: "Government Already Exists" });
-//         } else if (existingCity)
-//           return res
-//             .status(409)
-//             .json({ success: false, message: "City Already Exists" });
-//         else {
-//           city && existingCountry.Cities.push(city);
-//           government && existingCountry.Governments.push(government);
-//           rule = await rule.save();
-//           res
-//             .status(200)
-//             .json({ success: true, message: "City & Government Added", rule });
-//         }
-//       } else {
-//         rule.Countries.push({
-//           Name: country,
-//           Cities: [city],
-//           Governments: [government],
-//         });
-//         await rule.save();
-//         res
-//           .status(200)
-//           .json({ success: true, message: "Country Added Successfully", rule });
-//       }
-//     }
-//   } catch (err) {
-//     res.status(500).json({ success: false, message: err.message });
-//   }
-// });
-
 exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
   const { country, city, government } = req.body;
   try {
@@ -196,7 +102,6 @@ exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
 exports.GetAllUsers = expressAsyncHandler(async (req, res) => {
   try {
     await User.find({}).then((users) => {
@@ -232,7 +137,7 @@ exports.AddProduct = expressAsyncHandler(async (req, res) => {
 });
 
 exports.AddInfo = expressAsyncHandler(async (req, res) => {
-  const { text } = req.body;
+  const { text , video} = req.body;
   const { images } = req.files;
   try {
     const uploadedImages = await Promise.all(
@@ -246,6 +151,7 @@ exports.AddInfo = expressAsyncHandler(async (req, res) => {
     const rule = await Rules.findOne({ type: "home" });
     if (rule) {
       rule.Home.text = text;
+      rule.Home.video = video;
       rule.Home.images = uploadedImages;
       await rule.save();
       res.status(200).json({
@@ -258,6 +164,7 @@ exports.AddInfo = expressAsyncHandler(async (req, res) => {
         type: "home",
         Home: {
           text,
+          video,
           images: uploadedImages,
         },
       }).then((rule) =>

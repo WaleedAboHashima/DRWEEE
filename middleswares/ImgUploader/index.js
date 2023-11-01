@@ -11,7 +11,7 @@ module.exports = multer({
       cb(null, Date.now() + "__" + file.originalname),
   }),
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/jpg"];
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/jpg", "image/svg"];
     if (allowedTypes.includes(file.mimetype)) cb(null, true);
     else cb(new Error("Only image files are allowed"));
   },
