@@ -1,4 +1,4 @@
-const { AddUser, GetAllCountries, GetAllReports, GetAllOrders, GetRules, DeleteProduct, UpdateProduct, EditUser , ArchiveOrder, EditStatus} = require('../../controllers/Main');
+const { AddUser, GetAllCountries, GetAllReports, GetAllOrders, GetRules, DeleteProduct, UpdateProduct, EditUser , ArchiveOrder, EditStatus, DeleteCountry} = require('../../controllers/Main');
 const ImgUploader = require('../../middleswares/ImgUploader');
 const router = require('express').Router();
 
@@ -9,6 +9,7 @@ router.get('/orders', GetAllOrders)
 router.patch('/order/:id', ArchiveOrder)
 router.put('/order/:id', EditStatus)
 router.get("/countries-cities", GetRules);
+router.delete('/country/:id', DeleteCountry)
 router.delete('/delete/product/:id', DeleteProduct);
 router.put('/edit/user/:id', EditUser)
 router.put('/edit/product/:id', ImgUploader.fields([{name: 'image', maxCount: 1}]), UpdateProduct)

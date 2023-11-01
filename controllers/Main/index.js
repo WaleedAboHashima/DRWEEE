@@ -230,3 +230,30 @@ exports.EditStatus = expressAsyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+exports.DeleteCountry = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const rule = await Rules.findOne({ type: "countries" });
+    if (!rule)
+      return res
+        .status(404)
+        .json({ success: false, message: "No countries found" });
+    else {
+      const cIndex = rule.Countries.findIndex(
+        (country) => country._id.toString() === id
+      );
+      if (cIndex === -1) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Country not found" });
+      } else {
+        rule.Countries.splice(cIndex, 1);
+        await rule.save();
+        res.status(200).json({ success: true, message: "Country Deleted" });
+      }
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message});
+  }
+});

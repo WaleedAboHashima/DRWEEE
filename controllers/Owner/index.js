@@ -69,48 +69,112 @@ exports.AddVideo = expressAsyncHandler(async (req, res) => {
   }
 });
 
+// exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
+//   const { country, city, government } = req.body;
+//   try {
+//     let rule = await Rules.findOne({ type: "countries" });
+//     if (!rule) {
+//       const newCountry = new Rules({
+//         type: "countries",
+//         Countries: [
+//           {
+//             Name: country,
+//             Cities: [city],
+//             Governments: [government],
+//           },
+//         ],
+//       });
+//       rule = await newCountry.save();
+//       res
+//         .status(200)
+//         .json({ success: true, message: "Country Added", Results: rule });
+//     } else {
+//       const existingCountry = rule.Countries.find(
+//         (countryRule) => countryRule.Name === country
+//       );
+//       if (existingCountry) {
+//         const existingCity = existingCountry.Cities.find(
+//           (cityRule) => cityRule === city
+//         );
+//         const existingGovernments = existingCountry.Governments.find(
+//           (govRule) => govRule === government
+//         );
+//         if (existingGovernments) {
+//           return res
+//             .status(409)
+//             .json({ success: false, message: "Government Already Exists" });
+//         } else if (existingCity)
+//           return res
+//             .status(409)
+//             .json({ success: false, message: "City Already Exists" });
+//         else {
+//           city && existingCountry.Cities.push(city);
+//           government && existingCountry.Governments.push(government);
+//           rule = await rule.save();
+//           res
+//             .status(200)
+//             .json({ success: true, message: "City & Government Added", rule });
+//         }
+//       } else {
+//         rule.Countries.push({
+//           Name: country,
+//           Cities: [city],
+//           Governments: [government],
+//         });
+//         await rule.save();
+//         res
+//           .status(200)
+//           .json({ success: true, message: "Country Added Successfully", rule });
+//       }
+//     }
+//   } catch (err) {
+//     res.status(500).json({ success: false, message: err.message });
+//   }
+// });
+
 exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
   const { country, city, government } = req.body;
   try {
-    const rule = await Rules.findOne({ type: "countries" });
+    let rule = await Rules.findOne({ type: "countries" });
     if (!rule) {
       const newCountry = new Rules({
         type: "countries",
         Countries: [
           {
             Name: country,
-            Cities: [city],
-            Governments: [government],
+            Cities: city ? [city] : [],
+            Governments: government ? [government]: [],
           },
         ],
       });
-      await newCountry.save();
+      rule = await newCountry.save();
       res
         .status(200)
-        .json({ success: true, message: "Country Added", Results: newCountry });
+        .json({ success: true, message: "Country Added", Results: rule });
     } else {
       const existingCountry = rule.Countries.find(
         (countryRule) => countryRule.Name === country
       );
       if (existingCountry) {
-        const existingCity = existingCountry.Cities.find(
+        const existingCityIndex = existingCountry.Cities.findIndex(
           (cityRule) => cityRule === city
         );
-        const existingGovernments = existingCountry.Governments.find(
+        const existingGovernmentIndex = existingCountry.Governments.findIndex(
           (govRule) => govRule === government
         );
-        if (existingGovernments) {
+
+        if (existingGovernmentIndex !== -1) {
           return res
             .status(409)
             .json({ success: false, message: "Government Already Exists" });
-        } else if (existingCity)
+        } else if (existingCityIndex !== -1) {
           return res
             .status(409)
             .json({ success: false, message: "City Already Exists" });
-        else {
-          country && existingCountry.Cities.push(city);
+        } else {
+          city && existingCountry.Cities.push(city);
           government && existingCountry.Governments.push(government);
-          await rule.save();
+          await rule.save(); // Save the changes to the database
           res
             .status(200)
             .json({ success: true, message: "City & Government Added", rule });
@@ -131,6 +195,7 @@ exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
 
 exports.GetAllUsers = expressAsyncHandler(async (req, res) => {
   try {

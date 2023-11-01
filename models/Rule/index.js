@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 
+const countrySchema = new mongoose.Schema({
+  Name: String,
+  Cities: { type: [String], default: [] },
+  Governments: { type: [String], default: [] },
+});
+
 const ruleSchema = new mongoose.Schema({
   type: {
     type: String,
@@ -12,13 +18,7 @@ const ruleSchema = new mongoose.Schema({
   //   videoData: Buffer,
   //   mimeType: String,
   // },
-  Countries: {
-    type: Array,
-    Name: String,
-    Cities: [],
-    Governments: [],
-    Flag: String,
-  },
+  Countries: [countrySchema],
 
   Home: {
     text: { type: String },
