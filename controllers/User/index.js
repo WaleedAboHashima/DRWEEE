@@ -148,7 +148,7 @@ exports.AddToCart = expressAsyncHandler(async (req, res) => {
         );
         foundCart.totalPrice = price;
         foundCart.totalPoints = points;
-
+        await foundCart.save();
         const updatedCart = await Carts.findOneAndUpdate(
           { User: id },
           {
@@ -291,7 +291,7 @@ exports.AddOrder = expressAsyncHandler(async (req, res) => {
             Name: name,
             Phone: phone,
             Location: { lat: location.lat, lng: location.lng },
-            Address: address
+            Address: address,
           },
           Products: cart.Products,
           TotalPoints: cart.totalPoints,
@@ -349,6 +349,55 @@ exports.GetInfo = expressAsyncHandler(async (req, res) => {
         res.status(200).json({ success: true, data: rule.Home });
       }
     });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.UpdateCart = expressAsyncHandler(async (req, res) => {
+  const id = req.user.id;
+  const { prodId } = req.params;
+  const { quantity } = req.body;
+  if (quantity < 0 ) return res.status(403).json({ success: false, message: 'Quantity must be bigger than 0'});
+  try {
+    const foundCart = await Carts.findOne({ User: id });
+    if (!foundCart)
+      res.status(200).json({ success: false, message: "Cart not found" });
+    else {
+      const initialProduct = await Products.findById(prodId);
+      const productToUpdateIndex = foundCart.Products.findIndex(
+        (prod) => prod._id.toString() === prodId
+      );
+      foundCart.Products[productToUpdateIndex].Quantity = quantity;
+      foundCart.Products[productToUpdateIndex].Points =
+        initialProduct.Points * quantity;
+      foundCart.Products[productToUpdateIndex].Price =
+        initialProduct.Price * quantity;
+      const points = foundCart.Products.reduce(
+        (sum, product) => sum + product.Points,
+        0
+      );
+      const price = foundCart.Products.reduce(
+        (sum, product) => sum + product.Price,
+        0
+      );
+      foundCart.totalPrice = price;
+      foundCart.totalPoints = points;
+      const updatedCart = await Carts.findOneAndUpdate(
+        { User: id },
+        {
+          $set: {
+            Products: foundCart.Products,
+            totalPrice: foundCart.totalPrice,
+            totalPoints: foundCart.totalPoints,
+          },
+        },
+        { new: true }
+      );
+      res
+        .status(200)
+        .json({ success: true, message: "Product updated", updatedCart });
+    }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
