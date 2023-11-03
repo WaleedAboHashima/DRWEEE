@@ -160,10 +160,6 @@ exports.UpdateProduct = expressAsyncHandler(async (req, res) => {
         .secure_url;
       await Products.findByIdAndUpdate(id, {
         Image: imageUpload && imageUpload,
-        Name: name && name,
-        Points: points && points,
-        Price: price && price,
-        Description: description && description,
       }).then((product) =>
         res
           .status(200)
