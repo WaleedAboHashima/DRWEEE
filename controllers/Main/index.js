@@ -155,14 +155,16 @@ exports.UpdateProduct = expressAsyncHandler(async (req, res) => {
   const { name, points, description, price } = req.body;
   const { image } = req.files;
   try {
-    const imageUpload = (await cloudinary.uploader.upload(image[0].path))
-      .secure_url;
+    if (image) {
+      const imageUpload = (await cloudinary.uploader.upload(image[0].path))
+        .secure_url;
+    }
     await Products.findByIdAndUpdate(id, {
-      Image: imageUpload,
-      Name: name,
-      Points: points,
-      Price: price,
-      Description: description,
+      Image: imageUpload && imageUpload,
+      Name: name && name,
+      Points: points && points,
+      Price: price && price,
+      Description: description && description,
     }).then((product) =>
       res
         .status(200)
@@ -254,6 +256,6 @@ exports.DeleteCountry = expressAsyncHandler(async (req, res) => {
       }
     }
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message});
+    res.status(500).json({ success: false, message: err.message });
   }
 });
