@@ -158,18 +158,29 @@ exports.UpdateProduct = expressAsyncHandler(async (req, res) => {
     if (image) {
       const imageUpload = (await cloudinary.uploader.upload(image[0].path))
         .secure_url;
+      await Products.findByIdAndUpdate(id, {
+        Image: imageUpload && imageUpload,
+        Name: name && name,
+        Points: points && points,
+        Price: price && price,
+        Description: description && description,
+      }).then((product) =>
+        res
+          .status(200)
+          .json({ success: true, message: "ProductUpdated", product })
+      );
+    } else {
+      await Products.findByIdAndUpdate(id, {
+        Name: name && name,
+        Points: points && points,
+        Price: price && price,
+        Description: description && description,
+      }).then((product) =>
+        res
+          .status(200)
+          .json({ success: true, message: "ProductUpdated", product })
+      );
     }
-    await Products.findByIdAndUpdate(id, {
-      Image: imageUpload && imageUpload,
-      Name: name && name,
-      Points: points && points,
-      Price: price && price,
-      Description: description && description,
-    }).then((product) =>
-      res
-        .status(200)
-        .json({ success: true, message: "ProductUpdated", product })
-    );
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
