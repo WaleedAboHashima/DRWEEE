@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { AddCountriesandCities, GetAllUsers, AddProduct, AddInfo , GetAllProducts, GetAllOrders, DeleteUser} = require("../../controllers/Owner");
+const { AddCountriesandCities, GetAllUsers, AddProduct, AddInfo , GetAllProducts, GetAllOrders, DeleteUser, GetRequests} = require("../../controllers/Owner");
 const multer = require("multer");
 const ImgUploader = require("../../middleswares/ImgUploader");
 
@@ -13,4 +13,5 @@ router.post('/info', ImgUploader.fields([{name: 'images'}]) ,AddInfo)
 router.get('/products', GetAllProducts);
 router.get('/orders', GetAllOrders);
 router.delete('/user/:id', DeleteUser)
+router.get('/requests', GetRequests)
 module.exports = router;

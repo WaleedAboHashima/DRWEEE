@@ -6,6 +6,7 @@ const { Rules } = require("../../models/Rule/index");
 const { Products } = require("../../models/Products");
 const { Carts } = require("../../models/Cart");
 const { Orders } = require("../../models/Order");
+const { Requests } = require("../../models/Requests");
 const { json } = require("express");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
@@ -358,7 +359,10 @@ exports.UpdateCart = expressAsyncHandler(async (req, res) => {
   const id = req.user.id;
   const { prodId } = req.params;
   const { quantity } = req.body;
-  if (quantity < 0 ) return res.status(403).json({ success: false, message: 'Quantity must be bigger than 0'});
+  if (quantity < 0)
+    return res
+      .status(403)
+      .json({ success: false, message: "Quantity must be bigger than 0" });
   try {
     const foundCart = await Carts.findOne({ User: id });
     if (!foundCart)
@@ -400,5 +404,23 @@ exports.UpdateCart = expressAsyncHandler(async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.AddItem = expressAsyncHandler(async (req, res) => {
+  const { name, description } = req.body;
+  const { image } = req.files;
+  try {
+    const uploadedImage = (await cloudinary.uploader.upload(image[0].path))
+      .secure_url;
+    await Requests.create({
+      Image: uploadedImage,
+      Name: name,
+      Description: description,
+    }).then(() =>
+      res.status(200).json({ success: true, message: "Request Added" })
+    );
+  } catch (err) {
+    res.status(500).json({ success: false, meesage: err.message });
   }
 });

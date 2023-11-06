@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const { Rules } = require("../../models/Rule/index");
 const { Orders } = require("../../models/Order");
 const { Products } = require("../../models/Products");
+const { Requests } = require("../../models/Requests");
 require("dotenv").config();
 const cloudinary = require("cloudinary").v2;
 
@@ -49,7 +50,7 @@ exports.AddCountriesandCities = expressAsyncHandler(async (req, res) => {
           {
             Name: country,
             Cities: city ? [city] : [],
-            Governments: government ? [government]: [],
+            Governments: government ? [government] : [],
           },
         ],
       });
@@ -137,7 +138,7 @@ exports.AddProduct = expressAsyncHandler(async (req, res) => {
 });
 
 exports.AddInfo = expressAsyncHandler(async (req, res) => {
-  const { text , video} = req.body;
+  const { text, video } = req.body;
   const { images } = req.files;
   try {
     const uploadedImages = await Promise.all(
@@ -201,6 +202,16 @@ exports.DeleteUser = expressAsyncHandler(async (req, res) => {
       res
         .status(200)
         .json({ success: true, message: "User deleted successfully" })
+    );
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.GetRequests = expressAsyncHandler(async (req, res) => {
+  try {
+    await Requests.find({}).then((requests) =>
+      res.status(200).json({ success: true, requests })
     );
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
