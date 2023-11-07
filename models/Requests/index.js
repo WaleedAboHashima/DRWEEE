@@ -7,7 +7,7 @@ const requestSchema = new moongoose.Schema({
   },
   Image: {
     type: String,
-    required: true,
+    default: `https://drweee.onrender.com/images/default.png`
   },
   Name: {
     type: String,
