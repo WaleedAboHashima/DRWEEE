@@ -36,7 +36,7 @@ router.get("/order", GetOrder);
 router.delete("/order/:orderId", DeleteOrder);
 router.get("/home", GetInfo);
 router.post(
-  "/request",
+  "/request/:lat/:lng",
   ImgUploader.fields([{ name: "image", maxCount: 1 }]),
   AddItem
 );

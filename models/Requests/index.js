@@ -1,6 +1,10 @@
 const moongoose = require("mongoose");
 
 const requestSchema = new moongoose.Schema({
+  User: {
+    type: moongoose.Schema.Types.ObjectId,
+    ref: "Users",
+  },
   Image: {
     type: String,
     required: true,
@@ -8,10 +12,17 @@ const requestSchema = new moongoose.Schema({
   Name: {
     type: String,
     required: true,
-    unique: true,
+  },
+  Location: {
+    type: Object,
+    required: true,
   },
   Description: {
     type: String,
+    required: true,
+  },
+  Quantity: {
+    type: Number,
     required: true,
   },
 });

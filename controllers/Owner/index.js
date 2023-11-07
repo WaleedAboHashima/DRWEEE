@@ -217,3 +217,46 @@ exports.GetRequests = expressAsyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+exports.ConfirmRequest = expressAsyncHandler(async (req, res) => {
+  const { requestId } = req.params;
+  const { price, points } = req.body;
+  try {
+    const request = await Requests.findById(requestId).populate("User");
+    if (!request)
+      return res
+        .status(200)
+        .json({ success: false, message: "Request not found" });
+    else {
+      const newOrder = await Orders.create({
+        Info: request.User._id.toString(),
+        User: {
+          Name: request.User.fullName,
+          Phone: request.User.phone,
+          Location: request.Location,
+        },
+        Products: [
+          {
+            Image: request.Image,
+            Name: request.Name,
+            Description: request.Description,
+            Price: price,
+            Points: points,
+          },
+        ],
+        TotalPoints: points,
+        TotalPrice: price,
+      });
+      await Requests.findByIdAndRemove(requestId);
+      res
+        .status(200)
+        .json({
+          success: true,
+          message: "Order created successfully",
+          order: newOrder,
+        });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
