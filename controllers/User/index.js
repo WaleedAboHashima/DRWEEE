@@ -413,18 +413,32 @@ exports.AddItem = expressAsyncHandler(async (req, res) => {
   const { lat, lng } = req.params;
   const { image } = req.files;
   try {
-    const uploadedImage = (await cloudinary.uploader.upload(image[0].path))
+    if (image) {
+
+      const uploadedImage = (await cloudinary.uploader.upload(image[0].path))
       .secure_url;
-    await Requests.create({
-      User: userId,
-      Image: uploadedImage,
-      Name: name,
-      Location: { lat: lat, lng: lng },
-      Description: description,
-      Quantity: quantity,
-    }).then(() =>
+      await Requests.create({
+        User: userId,
+        Image: uploadedImage,
+        Name: name,
+        Location: { lat: lat, lng: lng },
+        Description: description,
+        Quantity: quantity,
+      }).then(() =>
       res.status(200).json({ success: true, message: "Request Added" })
-    );
+      );
+    }
+    else {
+      await Requests.create({
+        User: userId,
+        Name: name,
+        Location: { lat: lat, lng: lng },
+        Description: description,
+        Quantity: quantity,
+      }).then(() =>
+      res.status(200).json({ success: true, message: "Request Added" })
+      );
+    }
   } catch (err) {
     res.status(200).json({ success: false, meesage: err.message });
   }
