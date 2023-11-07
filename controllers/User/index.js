@@ -426,6 +426,6 @@ exports.AddItem = expressAsyncHandler(async (req, res) => {
       res.status(200).json({ success: true, message: "Request Added" })
     );
   } catch (err) {
-    res.status(500).json({ success: false, meesage: err.message });
+    res.status(200).json({ success: false, meesage: err.message });
   }
 });
