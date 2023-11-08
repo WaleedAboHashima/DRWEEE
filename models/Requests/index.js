@@ -7,7 +7,7 @@ const requestSchema = new moongoose.Schema({
   },
   Image: {
     type: String,
-    default: `https://drweee.onrender.com/images/default.png`
+    default: `https://cdn.vectorstock.com/i/preview-1x/79/10/product-icon-simple-element-vector-27077910.jpg`
   },
   Name: {
     type: String,
