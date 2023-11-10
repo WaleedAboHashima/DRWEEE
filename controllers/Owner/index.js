@@ -210,7 +210,7 @@ exports.DeleteUser = expressAsyncHandler(async (req, res) => {
 
 exports.GetRequests = expressAsyncHandler(async (req, res) => {
   try {
-    await Requests.find({}).then((requests) =>
+    await Requests.find({}).populate('User').then((requests) =>
       res.status(200).json({ success: true, requests })
     );
   } catch (err) {
@@ -256,6 +256,17 @@ exports.ConfirmRequest = expressAsyncHandler(async (req, res) => {
           order: newOrder,
         });
     }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.RemoveRequest = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Requests.findByIdAndDelete(id).then(
+      res.status(200).json({ success: true, message: "Request Deleted" })
+    );
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

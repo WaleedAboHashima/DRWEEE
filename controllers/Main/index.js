@@ -166,16 +166,14 @@ exports.UpdateProduct = expressAsyncHandler(async (req, res) => {
           .json({ success: true, message: "ProductUpdated", product })
       );
     } else {
-      await Products.findByIdAndUpdate(id, {
-        Name: name && name,
-        Points: points && points,
-        Price: price && price,
-        Description: description && description,
-      }).then((product) =>
-        res
-          .status(200)
-          .json({ success: true, message: "ProductUpdated", product })
-      );
+      await Products.findById(id).then(async (product) => {
+        product.Name = name ? name : product.Name;
+        product.Points = points ? points : product.Points;
+        product.Description = description ? description : product.Description;
+        product.Price = price ? price : product.Price;
+        await product.save();
+        res.status(200).json({ success: true, message: "Product updated" });
+      });
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

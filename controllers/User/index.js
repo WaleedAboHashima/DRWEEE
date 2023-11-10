@@ -331,6 +331,31 @@ exports.GetOrder = expressAsyncHandler(async (req, res) => {
   }
 });
 
+exports.GetDeliveredOrders = expressAsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    await Orders.find({ Info: id }).then((order) => {
+      if (!order)
+        return res
+          .status(200)
+          .json({ success: false, message: "No orders for this user" });
+      else {
+        const filter = order.filter(
+          (orders) =>
+            orders.Status === "Delivered" || orders.Status === "Canceled"
+        );
+        res.status(200).json({
+          success: true,
+          message: "Order retrieved successfully",
+          filter,
+        });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 exports.DeleteOrder = expressAsyncHandler(async (req, res) => {
   const { orderId } = req.params;
   try {
@@ -414,9 +439,8 @@ exports.AddItem = expressAsyncHandler(async (req, res) => {
   const { image } = req.files;
   try {
     if (image) {
-
       const uploadedImage = (await cloudinary.uploader.upload(image[0].path))
-      .secure_url;
+        .secure_url;
       await Requests.create({
         User: userId,
         Image: uploadedImage,
@@ -425,10 +449,9 @@ exports.AddItem = expressAsyncHandler(async (req, res) => {
         Description: description,
         Quantity: quantity,
       }).then(() =>
-      res.status(200).json({ success: true, message: "Request Added" })
+        res.status(200).json({ success: true, message: "Request Added" })
       );
-    }
-    else {
+    } else {
       await Requests.create({
         User: userId,
         Name: name,
@@ -436,10 +459,12 @@ exports.AddItem = expressAsyncHandler(async (req, res) => {
         Description: description,
         Quantity: quantity,
       }).then(() =>
-      res.status(200).json({ success: true, message: "Request Added" })
+        res.status(200).json({ success: true, message: "Request Added" })
       );
     }
   } catch (err) {
     res.status(200).json({ success: false, meesage: err.message });
   }
 });
+
+
