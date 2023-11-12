@@ -323,7 +323,7 @@ exports.GetOrder = expressAsyncHandler(async (req, res) => {
         res.status(200).json({
           success: true,
           message: "Order retrieved successfully",
-          filteredOrder,
+          order: filteredOrder,
         });
       }
     });
