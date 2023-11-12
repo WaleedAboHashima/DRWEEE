@@ -467,4 +467,18 @@ exports.AddItem = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
+exports.GetArchive = expressAsyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
+    await Orders.find({ Info: id }).then((orders) => {
+      if (orders.length > 0) {
+        const filtered = orders.filter((order) => order.Status === "Delivered");
+        res.status(200).json({ success: true, archive: filtered });
+      } else {
+        res.status(200).json({ success: true, archive: [] });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});

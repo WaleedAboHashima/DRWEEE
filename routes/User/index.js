@@ -20,6 +20,7 @@ const {
   UpdateCart,
   AddItem,
   GetDeliveredOrders,
+  GetArchive
 } = require("../../controllers/User");
 
 router.post("/changepwd", ChangePassword);
@@ -41,5 +42,6 @@ router.post(
   ImgUploader.fields([{ name: "image", maxCount: 1 }]),
   AddItem
 );
+router.get('/archive', GetArchive);
 router.get('/order/done', GetDeliveredOrders);
 module.exports = router;
