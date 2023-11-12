@@ -313,16 +313,17 @@ exports.AddOrder = expressAsyncHandler(async (req, res) => {
 exports.GetOrder = expressAsyncHandler(async (req, res) => {
   const { id } = req.user;
   try {
-    await Orders.find({ Info: id }).then((order) => {
-      if (!order)
+    await Orders.find({ Info: id }).then((orders) => {
+      if (!orders)
         return res
           .status(200)
           .json({ success: false, message: "No orders for this user" });
       else {
+        const filteredOrder = orders.filter(order => order.Status !== 'Delivered');
         res.status(200).json({
           success: true,
           message: "Order retrieved successfully",
-          order,
+          filteredOrder,
         });
       }
     });
