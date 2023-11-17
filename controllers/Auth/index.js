@@ -162,9 +162,21 @@ exports.GetCountries = expressAsyncHandler(async (req, res) => {
           (country) =>
             delete country._doc.Cities && delete country._doc.Governments
         );
-        res.status(200).json({ success: true, countries: rule.Countries });
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "Countries retreived successfully",
+            countries: rule.Countries,
+          });
       } else {
-        res.status(200).json({ success: true, countries: [] });
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "Countries retreived successfully",
+            countries: [],
+          });
       }
     });
   } catch (err) {
@@ -205,17 +217,20 @@ exports.GetCitiesOrGove = expressAsyncHandler(async (req, res) => {
 
 exports.CompleteProfile = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
-  const {country, city, government } = req.body;
-  if (!country || !city | !government) return res.status(200).json({ success: false, message: 'All Fields Are Required' });
+  const { country, city, government } = req.body;
+  if (!country || !city | !government)
+    return res
+      .status(200)
+      .json({ success: false, message: "All Fields Are Required" });
   try {
     await User.findById(id).then(async (user) => {
       user.Country = country;
       user.City = city;
       user.Government = government;
       user.complete = true;
-      await user.save()
-      res.status(200).json({ success: true, message: 'Profile Completed'});
-    })
+      await user.save();
+      res.status(200).json({ success: true, message: "Profile Completed" });
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
