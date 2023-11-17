@@ -6,7 +6,8 @@ const {
   OTPCheck,
   UpdatePassword,
   GetCitiesOrGove,
-  GetCountries
+  GetCountries,
+  CompleteProfile
 } = require("../../controllers/Auth");
 
 router.post("/login", Login);
@@ -15,5 +16,6 @@ router.post("/forget", ForgetPassword);
 router.post("/otp", OTPCheck);
 router.post("/reset", UpdatePassword);
 router.get('/countries', GetCountries);
+router.post('/profile/complete/:id', CompleteProfile)
 router.get('/countries/:type/:country', GetCitiesOrGove)
 module.exports = router;

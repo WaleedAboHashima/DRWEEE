@@ -42,8 +42,7 @@ exports.Login = expressAsyncHandler(async (req, res) => {
 });
 
 exports.Register = expressAsyncHandler(async (req, res) => {
-  const { fullName, email, password, phone, type, country, city, government } =
-    req.body;
+  const { fullName, email, password, phone, type } = req.body;
   if (!email || !fullName || !password || !phone)
     return res
       .status(200)
@@ -61,29 +60,14 @@ exports.Register = expressAsyncHandler(async (req, res) => {
         await User.create({
           fullName,
           email,
-          Country: country && country,
-          Government: government && government,
-          City: city && city,
           password: newPassword,
           phone,
           role: type === "merchant" ? "Merchant" : "User",
-        }).then(async (user) => {
-          if (user.City && user.Country && user.Government) {
-            user.complete = true;
-            await user.save();
-            res.status(201).json({
-              success: true,
-              message: "User created successfully",
-              user,
-            });
-          } else {
-            res.status(201).json({
-              success: true,
-              message: "User created successfully",
-              user,
-            });
-          }
-        });
+        }).then((user) =>
+          res
+            .status(201)
+            .json({ success: true, message: "User created successfully", user })
+        );
       }
     } catch (err) {
       res.status(500).json({ success: false, message: err });
@@ -214,6 +198,24 @@ exports.GetCitiesOrGove = expressAsyncHandler(async (req, res) => {
         .status(200)
         .json({ success: false, message: "No country with this name found" });
     }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.CompleteProfile = expressAsyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const {country, city, government } = req.body;
+  if (!country || !city | !government) return res.status(200).json({ success: false, message: 'All Fields Are Required' });
+  try {
+    await User.findById(id).then(async (user) => {
+      user.Country = country;
+      user.City = city;
+      user.Government = government;
+      user.complete = true;
+      await user.save()
+      res.status(200).json({ success: true, message: 'Profile Completed'});
+    })
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
