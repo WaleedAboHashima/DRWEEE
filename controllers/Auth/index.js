@@ -4,6 +4,7 @@ const expressAsyncHandler = require("express-async-handler");
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const { SendOTP, VerifyOTP } = require("../../config/OTP");
 const jwt = require("jsonwebtoken");
+const { Rules } = require("./../../models/Rule");
 
 exports.Login = expressAsyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -20,20 +21,18 @@ exports.Login = expressAsyncHandler(async (req, res) => {
             .status(200)
             .json({ success: false, message: "Incorrect password" });
         else {
-          delete user._doc.password && delete user._doc.__V;
+          delete user._doc.password && delete user._doc.__v;
           const token = jwt.sign(
             { id: user.id, role: user.role, email: user.email },
             process.env.TOKEN,
             { expiresIn: "30d" }
           );
-          res
-            .status(200)
-            .json({
-              success: true,
-              message: "Logged in Successfully.",
-              user: user.toObject(),
-              token,
-            });
+          res.status(200).json({
+            success: true,
+            message: "Logged in Successfully.",
+            user: user.toObject(),
+            token,
+          });
         }
       }
     });
@@ -43,7 +42,8 @@ exports.Login = expressAsyncHandler(async (req, res) => {
 });
 
 exports.Register = expressAsyncHandler(async (req, res) => {
-  const { fullName, email, password, phone, type } = req.body;
+  const { fullName, email, password, phone, type, country, city, government } =
+    req.body;
   if (!email || !fullName || !password || !phone)
     return res
       .status(200)
@@ -61,14 +61,29 @@ exports.Register = expressAsyncHandler(async (req, res) => {
         await User.create({
           fullName,
           email,
+          Country: country && country,
+          Government: government && government,
+          City: city && city,
           password: newPassword,
           phone,
           role: type === "merchant" ? "Merchant" : "User",
-        }).then((user) =>
-          res
-            .status(201)
-            .json({ success: true, message: "User created successfully", user })
-        );
+        }).then(async (user) => {
+          if (user.City && user.Country && user.Government) {
+            user.complete = true;
+            await user.save();
+            res.status(201).json({
+              success: true,
+              message: "User created successfully",
+              user,
+            });
+          } else {
+            res.status(201).json({
+              success: true,
+              message: "User created successfully",
+              user,
+            });
+          }
+        });
       }
     } catch (err) {
       res.status(500).json({ success: false, message: err });
@@ -152,5 +167,54 @@ exports.UpdatePassword = expressAsyncHandler(async (req, res) => {
     } catch (err) {
       res.status(500).json({ success: false, message: err });
     }
+  }
+});
+
+exports.GetCountries = expressAsyncHandler(async (req, res) => {
+  try {
+    await Rules.findOne({ type: "countries" }).then((rule) => {
+      if (rule) {
+        rule.Countries.map(
+          (country) =>
+            delete country._doc.Cities && delete country._doc.Governments
+        );
+        res.status(200).json({ success: true, countries: rule.Countries });
+      } else {
+        res.status(200).json({ success: true, countries: [] });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.GetCitiesOrGove = expressAsyncHandler(async (req, res) => {
+  const { type, country } = req.params;
+  const rule = await Rules.findOne({ type: "countries" });
+  const selectedCountry = rule.Countries.find((c) => c.Name === country);
+  try {
+    if (selectedCountry) {
+      if (type === "cities") {
+        res.status(200).json({
+          success: true,
+          message: "Cities Retreived Successfully",
+          cities: selectedCountry.Cities,
+        });
+      } else if (type === "governments") {
+        res.status(200).json({
+          success: true,
+          message: "Gove Retreived Successfully",
+          governments: selectedCountry.Governments,
+        });
+      } else {
+        res.status(200).json({ success: false, message: "invalid type" });
+      }
+    } else {
+      res
+        .status(200)
+        .json({ success: false, message: "No country with this name found" });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });

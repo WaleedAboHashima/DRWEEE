@@ -4,8 +4,6 @@ const ImgUploader = require("../../middleswares/ImgUploader");
 const {
   ChangePassword,
   GetProfile,
-  GetRules,
-  GetVideo,
   UpdateProfile,
   SubmitReports,
   GetCart,
@@ -20,7 +18,7 @@ const {
   UpdateCart,
   AddItem,
   GetDeliveredOrders,
-  GetArchive
+  GetArchive,
 } = require("../../controllers/User");
 
 router.post("/changepwd", ChangePassword);

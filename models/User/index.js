@@ -40,7 +40,11 @@ const userScehma = new mongoose.Schema({
   },
   permission: {
     type: String,
-    enum: ['AddAdmins', 'AddSuperVisors', 'AddCityAdmin', '']
+    enum: ["AddAdmins", "AddSuperVisors", "AddCityAdmin", ""],
+  },
+  complete: {
+    type: Boolean,
+    default: false,
   },
 });
 

@@ -315,15 +315,19 @@ exports.GetOrder = expressAsyncHandler(async (req, res) => {
   try {
     await Orders.find({ Info: id }).then((orders) => {
       if (!orders)
-        return res
-          .status(200)
-          .json({ success: false, message: "No orders for this user" });
+        return res.status(200).json({
+          success: false,
+          message: "No orders for this user",
+          orders: [],
+        });
       else {
-        const filteredOrder = orders.filter(order => order.Status !== 'Delivered');
+        const filter = orders.filter(
+          (order) => order.Status === "Pending" || order.Status === "On the way"
+        );
         res.status(200).json({
           success: true,
           message: "Order retrieved successfully",
-          order: filteredOrder,
+          order: filter,
         });
       }
     });
@@ -341,14 +345,11 @@ exports.GetDeliveredOrders = expressAsyncHandler(async (req, res) => {
           .status(200)
           .json({ success: false, message: "No orders for this user" });
       else {
-        const filter = order.filter(
-          (orders) =>
-            orders.Status === "Delivered" || orders.Status === "Canceled"
-        );
+        const filter = order.filter((orders) => orders.Status === "Delivered");
         res.status(200).json({
           success: true,
           message: "Order retrieved successfully",
-          filter,
+          orders: filter,
         });
       }
     });
@@ -473,7 +474,9 @@ exports.GetArchive = expressAsyncHandler(async (req, res) => {
   try {
     await Orders.find({ Info: id }).then((orders) => {
       if (orders.length > 0) {
-        const filtered = orders.filter((order) => order.Status === "Delivered");
+        const filtered = orders.filter(
+          (order) => order.Status === "Delivered" || order.Status === "Canceled"
+        );
         res.status(200).json({ success: true, archive: filtered });
       } else {
         res.status(200).json({ success: true, archive: [] });
@@ -483,3 +486,5 @@ exports.GetArchive = expressAsyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+
