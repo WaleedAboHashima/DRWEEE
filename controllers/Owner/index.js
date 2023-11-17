@@ -189,10 +189,12 @@ exports.GetAllProducts = expressAsyncHandler(async (req, res) => {
 
 exports.GetAllOrders = expressAsyncHandler(async (req, res) => {
   try {
-    await Orders.find({}).then((orders) => {
+    await Orders.find({}).populate('Info').then((orders) => {
       res.status(200).json({ success: true, orders });
     });
-  } catch (err) {}
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 exports.DeleteUser = expressAsyncHandler(async (req, res) => {
