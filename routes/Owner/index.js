@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { AddCountriesandCities, GetAllUsers, AddProduct, AddInfo , GetAllProducts, GetAllOrders, DeleteUser, GetRequests, ConfirmRequest} = require("../../controllers/Owner");
+const { AddCountriesandCities, GetAllUsers, AddProduct, AddInfo , GetAllProducts, GetAllOrders, DeleteUser, GetRequests, ConfirmRequest, Addcitytocountry} = require("../../controllers/Owner");
 const multer = require("multer");
 const ImgUploader = require("../../middleswares/ImgUploader");
 const { RemoveRequest } = require("../../controllers/Owner");
@@ -17,4 +17,5 @@ router.delete('/user/:id', DeleteUser)
 router.get('/requests', GetRequests)
 router.put('/request/:requestId', ConfirmRequest)
 router.delete('/request/:id', RemoveRequest);
+router.post('/add/city/:country', Addcitytocountry)
 module.exports = router;

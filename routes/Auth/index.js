@@ -17,5 +17,5 @@ router.post("/otp", OTPCheck);
 router.post("/reset", UpdatePassword);
 router.get('/countries', GetCountries);
 router.post('/profile/complete/:id', CompleteProfile)
-router.get('/countries/:type/:country', GetCitiesOrGove)
+router.get('/countries/:type/:country/:city', GetCitiesOrGove)
 module.exports = router;

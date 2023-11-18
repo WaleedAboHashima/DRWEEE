@@ -2,8 +2,11 @@ const mongoose = require("mongoose");
 
 const countrySchema = new mongoose.Schema({
   Name: String,
-  Cities: { type: [String], default: [] },
-  Governments: { type: [String], default: [] },
+  Cities: {
+    type: Array,
+    Name: String,
+    Governments: { type: [String], default: [] },
+  },
 });
 
 const ruleSchema = new mongoose.Schema({

@@ -189,9 +189,11 @@ exports.GetAllProducts = expressAsyncHandler(async (req, res) => {
 
 exports.GetAllOrders = expressAsyncHandler(async (req, res) => {
   try {
-    await Orders.find({}).populate('Info').then((orders) => {
-      res.status(200).json({ success: true, orders });
-    });
+    await Orders.find({})
+      .populate("Info")
+      .then((orders) => {
+        res.status(200).json({ success: true, orders });
+      });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -212,9 +214,9 @@ exports.DeleteUser = expressAsyncHandler(async (req, res) => {
 
 exports.GetRequests = expressAsyncHandler(async (req, res) => {
   try {
-    await Requests.find({}).populate('User').then((requests) =>
-      res.status(200).json({ success: true, requests })
-    );
+    await Requests.find({})
+      .populate("User")
+      .then((requests) => res.status(200).json({ success: true, requests }));
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -250,13 +252,11 @@ exports.ConfirmRequest = expressAsyncHandler(async (req, res) => {
         TotalPrice: price,
       });
       await Requests.findByIdAndRemove(requestId);
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Order created successfully",
-          order: newOrder,
-        });
+      res.status(200).json({
+        success: true,
+        message: "Order created successfully",
+        order: newOrder,
+      });
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -273,3 +273,85 @@ exports.RemoveRequest = expressAsyncHandler(async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+exports.Addcitytocountry = expressAsyncHandler(async (req, res) => {
+  const { country } = req.params;
+  const { city, gove } = req.body;
+
+  // Find the rule for countries
+  let rules = await Rules.findOne({ type: "countries" });
+
+  if (!rules) {
+    // If there are no rules for countries, create a new one
+    let newRules = await Rules.create({ type: "countries", Countries: [] });
+    rules = newRules;
+  }
+
+  // Check if the country already exists in the rules
+  const countryIndex = rules.Countries.findIndex((c) => c.Name === country);
+
+  if (countryIndex === -1) {
+    // If the country doesn't exist, add it with the new city and gove
+    await Rules.updateOne(
+      { type: "countries" },
+      {
+        $push: {
+          Countries: {
+            Name: country,
+            Cities: [{ Name: city, Governments: [gove] }],
+          },
+        },
+      }
+    );
+  } else {
+    // If the country exists, find the city index
+    const cityIndex = rules.Countries[countryIndex].Cities.findIndex(
+      (c) => c.Name === city
+    );
+
+    if (cityIndex === -1) {
+      // If the city doesn't exist, add it with the new gove
+      await Rules.updateOne(
+        { type: "countries", "Countries.Name": country },
+        {
+          $push: {
+            "Countries.$.Cities": {
+              Name: city,
+              Governments: [gove],
+            },
+          },
+        }
+      );
+    } else {
+      // If the city exists, check if the government already exists
+      const governmentExists = rules.Countries[countryIndex].Cities[cityIndex].Governments.includes(gove);
+
+      if (!governmentExists) {
+        // If the government doesn't exist, append it to the array
+        await Rules.updateOne(
+          { type: "countries", "Countries.Name": country, "Countries.Cities.Name": city },
+          {
+            $push: {
+              "Countries.$[country].Cities.$[city].Governments": gove,
+            },
+          },
+          {
+            arrayFilters: [{ "country.Name": country }, { "city.Name": city }],
+          }
+        );
+      }
+      else {
+        res.status(409).json({success: false, message: 'Government Exists'});
+      }
+    }
+  }
+
+  res.status(200).json({ success: true, message: 'Data added successfully' });
+});
+
+
+
+
+
+
+

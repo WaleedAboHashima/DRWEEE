@@ -162,21 +162,17 @@ exports.GetCountries = expressAsyncHandler(async (req, res) => {
           (country) =>
             delete country._doc.Cities && delete country._doc.Governments
         );
-        res
-          .status(200)
-          .json({
-            success: true,
-            message: "Countries retreived successfully",
-            countries: rule.Countries,
-          });
+        res.status(200).json({
+          success: true,
+          message: "Countries retreived successfully",
+          countries: rule.Countries,
+        });
       } else {
-        res
-          .status(200)
-          .json({
-            success: true,
-            message: "Countries retreived successfully",
-            countries: [],
-          });
+        res.status(200).json({
+          success: true,
+          message: "Countries retreived successfully",
+          countries: [],
+        });
       }
     });
   } catch (err) {
@@ -185,23 +181,34 @@ exports.GetCountries = expressAsyncHandler(async (req, res) => {
 });
 
 exports.GetCitiesOrGove = expressAsyncHandler(async (req, res) => {
-  const { type, country } = req.params;
+  const { type, country, city } = req.params;
   const rule = await Rules.findOne({ type: "countries" });
   const selectedCountry = rule.Countries.find((c) => c.Name === country);
   try {
     if (selectedCountry) {
       if (type === "cities") {
+        const foundCities = selectedCountry.Cities.map(
+          ({ Governments, ...rest }) => rest
+        );
         res.status(200).json({
           success: true,
-          message: "Cities Retreived Successfully",
-          cities: selectedCountry.Cities,
+          message: "Cities Retrieved Successfully",
+          cities: foundCities,
         });
       } else if (type === "governments") {
-        res.status(200).json({
-          success: true,
-          message: "Gove Retreived Successfully",
-          governments: selectedCountry.Governments,
-        });
+        const foundCity = await selectedCountry.Cities.find(
+          (c) => c.Name === city
+        );
+        if (foundCity) {
+          res.status(200).json({
+            success: true,
+            message: "Gove Retreived Successfully",
+            governments: foundCity.Governments,
+          });
+        }
+        else {
+          res.status(200).json({success: false, message: 'City not found'})
+        }
       } else {
         res.status(200).json({ success: false, message: "invalid type" });
       }
