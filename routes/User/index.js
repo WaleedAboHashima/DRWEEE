@@ -19,6 +19,7 @@ const {
   AddItem,
   GetDeliveredOrders,
   GetArchive,
+  GetAd
 } = require("../../controllers/User");
 
 router.post("/changepwd", ChangePassword);
@@ -42,4 +43,5 @@ router.post(
 );
 router.get('/archive', GetArchive);
 router.get('/order/done', GetDeliveredOrders);
+router.get('/ad', GetAd)
 module.exports = router;

@@ -324,12 +324,19 @@ exports.Addcitytocountry = expressAsyncHandler(async (req, res) => {
       );
     } else {
       // If the city exists, check if the government already exists
-      const governmentExists = rules.Countries[countryIndex].Cities[cityIndex].Governments.includes(gove);
+      const governmentExists =
+        rules.Countries[countryIndex].Cities[cityIndex].Governments.includes(
+          gove
+        );
 
       if (!governmentExists) {
         // If the government doesn't exist, append it to the array
         await Rules.updateOne(
-          { type: "countries", "Countries.Name": country, "Countries.Cities.Name": city },
+          {
+            type: "countries",
+            "Countries.Name": country,
+            "Countries.Cities.Name": city,
+          },
           {
             $push: {
               "Countries.$[country].Cities.$[city].Governments": gove,
@@ -339,19 +346,41 @@ exports.Addcitytocountry = expressAsyncHandler(async (req, res) => {
             arrayFilters: [{ "country.Name": country }, { "city.Name": city }],
           }
         );
-      }
-      else {
-        res.status(409).json({success: false, message: 'Government Exists'});
+      } else {
+        res.status(409).json({ success: false, message: "Government Exists" });
       }
     }
   }
 
-  res.status(200).json({ success: true, message: 'Data added successfully' });
+  res.status(200).json({ success: true, message: "Data added successfully" });
 });
 
-
-
-
-
-
-
+exports.AddAds = expressAsyncHandler(async (req, res) => {
+  const { video } = req.body;
+  const { image } = req.files;
+  try {
+    const uploadedImage = (await cloudinary.uploader.upload(image[0].path))
+      .secure_url;
+    const rule = await Rules.findOne({ type: "ad" }).select('-Countries -Home').exec();
+    if (rule) {
+      rule.Ad.image = uploadedImage;
+      rule.Ad.video = video;
+      await rule.save();
+      res.status(200).json({ success: true, message: "Ad updated successfully", rule });
+    } else {
+      await Rules.create({
+        type: "ad",
+        Ad: { image: uploadedImage, video },
+      }).then((rule) => {
+        delete rule._doc.Home &&
+          delete rule._doc.Countries &&
+          delete rule._doc.__v;
+        res
+          .status(201)
+          .json({ success: true, message: "Ad added successfully", rule });
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});

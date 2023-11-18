@@ -487,4 +487,24 @@ exports.GetArchive = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
+exports.GetAd = expressAsyncHandler(async (req, res) => {
+  try {
+    await Rules.findOne({ type: "ad" })
+      .select("-Countries -Home")
+      .then((rule) => {
+        if (rule) {
+          res
+            .status(200)
+            .json({
+              success: true,
+              message: "Ads Retrieved Succesfully",
+              ad: rule.Ad,
+            });
+        } else {
+          res.status(200).json({ success: true, message: "Empty Ad", ad: {} });
+        }
+      });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});

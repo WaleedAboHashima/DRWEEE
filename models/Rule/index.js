@@ -12,8 +12,7 @@ const countrySchema = new mongoose.Schema({
 const ruleSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ["video", "countries", "home"],
-    required: true,
+    enum: ["video", "countries", "home", "ad"],
   },
   // Video: {
   //   title: String,
@@ -21,8 +20,11 @@ const ruleSchema = new mongoose.Schema({
   //   videoData: Buffer,
   //   mimeType: String,
   // },
-  Countries: [countrySchema],
-
+  Countries: { type: [countrySchema], select: false },
+  Ad: {
+    image: { type: String },
+    video: { type: String },
+  },
   Home: {
     text: { type: String },
     images: [],
