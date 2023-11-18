@@ -207,7 +207,7 @@ exports.GetCitiesOrGove = expressAsyncHandler(async (req, res) => {
           });
         }
         else {
-          res.status(200).json({success: false, message: 'City not found'})
+          res.status(200).json({success: false, message: 'City not found', cities: []})
         }
       } else {
         res.status(200).json({ success: false, message: "invalid type" });
@@ -215,7 +215,7 @@ exports.GetCitiesOrGove = expressAsyncHandler(async (req, res) => {
     } else {
       res
         .status(200)
-        .json({ success: false, message: "No country with this name found" });
+        .json({ success: false, message: "No country with this name found", cities: []});
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
