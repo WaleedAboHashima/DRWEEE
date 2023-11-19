@@ -365,8 +365,9 @@ exports.AddAds = expressAsyncHandler(async (req, res) => {
       .select("-Countries -Home")
       .exec();
     if (rule) {
-      rule.Ad.image = uploadedImage;
-      rule.Ad.video = video;
+      text ? rule.Ad.text = text : rule.Ad.text = rule.Ad.text;
+      image ? rule.Ad.image = uploadedImage : rule.Ad.image = rule.Ad.image;
+      video ? rule.Ad.video = video : rule.Ad.video = rule.Ad.video;
       await rule.save();
       res
         .status(200)
