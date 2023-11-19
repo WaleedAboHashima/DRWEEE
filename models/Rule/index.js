@@ -20,9 +20,9 @@ const ruleSchema = new mongoose.Schema({
   //   videoData: Buffer,
   //   mimeType: String,
   // },
-  Countries: { type: [countrySchema], select: false },
+  Countries: [countrySchema],
   Ad: {
-    text: {type: String},
+    text: { type: String },
     image: { type: String },
     video: { type: String },
   },
