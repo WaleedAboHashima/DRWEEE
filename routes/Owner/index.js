@@ -36,7 +36,7 @@ router.delete("/request/:id", RemoveRequest);
 router.post("/add/city/:country", Addcitytocountry);
 router.post(
   "/ad",
-  ImgUploader.fields([{ name: "image", maxCount: 1 }]),
+  ImgUploader.fields([{ name: "images" }]),
   AddAds
 );
 module.exports = router;

@@ -19,7 +19,7 @@ const {
   AddItem,
   GetDeliveredOrders,
   GetArchive,
-  GetAd
+  GetAd,
 } = require("../../controllers/User");
 
 router.post("/changepwd", ChangePassword);
@@ -38,10 +38,10 @@ router.delete("/order/:orderId", DeleteOrder);
 router.get("/home", GetInfo);
 router.post(
   "/request/:lat/:lng",
-  ImgUploader.fields([{ name: "image", maxCount: 1 }]),
+  ImgUploader.fields([{ name: "images" }]),
   AddItem
 );
-router.get('/archive', GetArchive);
-router.get('/order/done', GetDeliveredOrders);
-router.get('/ad', GetAd)
+router.get("/archive", GetArchive);
+router.get("/order/done", GetDeliveredOrders);
+router.get("/ad", GetAd);
 module.exports = router;

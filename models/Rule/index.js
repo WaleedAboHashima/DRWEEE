@@ -23,7 +23,7 @@ const ruleSchema = new mongoose.Schema({
   Countries: [countrySchema],
   Ad: {
     text: { type: String },
-    image: { type: String },
+    image: [],
     video: { type: String },
   },
   Home: {

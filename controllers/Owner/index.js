@@ -357,17 +357,25 @@ exports.Addcitytocountry = expressAsyncHandler(async (req, res) => {
 
 exports.AddAds = expressAsyncHandler(async (req, res) => {
   const { video, text } = req.body;
-  const { image } = req.files;
+  const { images } = req.files;
   try {
-    const uploadedImage = (await cloudinary.uploader.upload(image[0].path))
-      .secure_url;
+    const uploadedImages = await Promise.all(
+      images.map(
+        async (image) =>
+          (
+            await cloudinary.uploader.upload(image.path)
+          ).secure_url
+      )
+    );
     const rule = await Rules.findOne({ type: "ad" })
       .select("-Countries -Home")
       .exec();
     if (rule) {
-      text ? rule.Ad.text = text : rule.Ad.text = rule.Ad.text;
-      image ? rule.Ad.image = uploadedImage : rule.Ad.image = rule.Ad.image;
-      video ? rule.Ad.video = video : rule.Ad.video = rule.Ad.video;
+      text ? (rule.Ad.text = text) : (rule.Ad.text = rule.Ad.text);
+      images
+        ? (rule.Ad.image = uploadedImages)
+        : (rule.Ad.image = rule.Ad.image);
+      video ? (rule.Ad.video = video) : (rule.Ad.video = rule.Ad.video);
       await rule.save();
       res
         .status(200)
@@ -375,7 +383,7 @@ exports.AddAds = expressAsyncHandler(async (req, res) => {
     } else {
       await Rules.create({
         type: "ad",
-        Ad: { text, image: uploadedImage, video },
+        Ad: { text, image: uploadedImages, video },
       }).then((rule) => {
         delete rule._doc.Home &&
           delete rule._doc.Countries &&
