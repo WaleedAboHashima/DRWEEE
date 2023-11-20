@@ -141,19 +141,22 @@ exports.AddInfo = expressAsyncHandler(async (req, res) => {
   const { text, video } = req.body;
   const { images } = req.files;
   try {
-    const uploadedImages = await Promise.all(
-      images.map(
-        async (image) =>
-          (
-            await cloudinary.uploader.upload(image.path)
-          ).secure_url
-      )
-    );
+    let uploadedImages = [];
+    if (images) {
+      uploadedImages = await Promise.all(
+        images.map(async (image) => {
+          const uploadedImage = await cloudinary.uploader.upload(image.path);
+          return uploadedImage.secure_url;
+        })
+      );
+    }
     const rule = await Rules.findOne({ type: "home" });
     if (rule) {
-      rule.Home.text = text;
-      rule.Home.video = video;
-      rule.Home.images = uploadedImages;
+      text ? (rule.Ad.text = text) : (rule.Ad.text = rule.Ad.text);
+      images
+        ? (rule.Ad.image = uploadedImages)
+        : (rule.Ad.image = rule.Ad.image);
+      video ? (rule.Ad.video = video) : (rule.Ad.video = rule.Ad.video);
       await rule.save();
       res.status(200).json({
         success: true,
@@ -359,14 +362,15 @@ exports.AddAds = expressAsyncHandler(async (req, res) => {
   const { video, text } = req.body;
   const { images } = req.files;
   try {
-    const uploadedImages = await Promise.all(
-      images.map(
-        async (image) =>
-          (
-            await cloudinary.uploader.upload(image.path)
-          ).secure_url
-      )
-    );
+    let uploadedImages = [];
+    if (images) {
+      uploadedImages = await Promise.all(
+        images.map(async (image) => {
+          const uploadedImage = await cloudinary.uploader.upload(image.path);
+          return uploadedImage.secure_url;
+        })
+      );
+    }
     const rule = await Rules.findOne({ type: "ad" })
       .select("-Countries -Home")
       .exec();
