@@ -477,9 +477,21 @@ exports.GetArchive = expressAsyncHandler(async (req, res) => {
         const filtered = orders.filter(
           (order) => order.Status === "Delivered" || order.Status === "Canceled"
         );
-        res.status(200).json({ success: true, archive: filtered });
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "Archive retrieved successfully",
+            archive: filtered,
+          });
       } else {
-        res.status(200).json({ success: true, archive: [] });
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "Archive retrieved successfully",
+            archive: [],
+          });
       }
     });
   } catch (err) {
@@ -493,13 +505,11 @@ exports.GetAd = expressAsyncHandler(async (req, res) => {
       .select("-Countries -Home")
       .then((rule) => {
         if (rule) {
-          res
-            .status(200)
-            .json({
-              success: true,
-              message: "Ads Retrieved Succesfully",
-              ad: rule.Ad,
-            });
+          res.status(200).json({
+            success: true,
+            message: "Ads Retrieved Succesfully",
+            ad: rule.Ad,
+          });
         } else {
           res.status(200).json({ success: true, message: "Empty Ad", ad: {} });
         }

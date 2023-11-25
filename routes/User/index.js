@@ -42,6 +42,5 @@ router.post(
   AddItem
 );
 router.get("/archive", GetArchive);
-router.get("/order/done", GetDeliveredOrders);
 router.get("/ad", GetAd);
 module.exports = router;
