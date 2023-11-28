@@ -152,10 +152,18 @@ exports.DeleteProduct = expressAsyncHandler(async (req, res) => {
 
 exports.UpdateProduct = expressAsyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, points, description, price } = req.body;
+  const { name, points, description, price, index } = req.body;
   const { image } = req.files;
   try {
     if (image) {
+      if (index) {
+        const productToFind = await Products.findOne({Index: index});
+        const productToSwap = await Products.findById(id);
+        productToFind.Index = productToSwap.Index;
+        await productToFind.save();
+        productToSwap.Index = index;
+        await productToSwap.save();
+      }
       const imageUpload = (await cloudinary.uploader.upload(image[0].path))
         .secure_url;
       await Products.findByIdAndUpdate(id, {
@@ -166,6 +174,14 @@ exports.UpdateProduct = expressAsyncHandler(async (req, res) => {
           .json({ success: true, message: "ProductUpdated", product })
       );
     } else {
+      if (index) {
+        const productToFind = await Products.findOne({Index: index});
+        const productToSwap = await Products.findById(id);
+        productToFind.Index = productToSwap.Index;
+        await productToFind.save();
+        productToSwap.Index = index;
+        await productToSwap.save();
+      }
       await Products.findById(id).then(async (product) => {
         product.Name = name ? name : product.Name;
         product.Points = points ? points : product.Points;

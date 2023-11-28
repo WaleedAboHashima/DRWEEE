@@ -22,6 +22,9 @@ const productsSchema = new moongoose.Schema({
     type: Number,
     default: 1,
   },
+  Index: {
+    type: Number,
+  },
 });
 
 exports.Products = moongoose.model("Products", productsSchema);

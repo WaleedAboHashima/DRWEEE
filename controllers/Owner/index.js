@@ -121,6 +121,12 @@ exports.AddProduct = expressAsyncHandler(async (req, res) => {
   const { name, points, description, price } = req.body;
   const { image } = req.files;
   try {
+    const lastProduct = await Products.findOne().sort({ Index: -1 });
+
+    // Calculate the next available index
+    const nextIndex = lastProduct ? lastProduct.Index + 1 : 1;
+
+
     const imageUpload = (await cloudinary.uploader.upload(image[0].path))
       .secure_url;
     await Products.create({
@@ -129,6 +135,7 @@ exports.AddProduct = expressAsyncHandler(async (req, res) => {
       Points: points,
       Price: price,
       Description: description,
+      Index: nextIndex
     }).then(() => {
       res.status(201).json({ success: true, message: "Product Added" });
     });
@@ -182,7 +189,7 @@ exports.AddInfo = expressAsyncHandler(async (req, res) => {
 
 exports.GetAllProducts = expressAsyncHandler(async (req, res) => {
   try {
-    await Products.find({}).then((products) => {
+    await Products.find({}).sort({Index: 1}).then((products) => {
       res.status(200).json({ success: true, products });
     });
   } catch (err) {
