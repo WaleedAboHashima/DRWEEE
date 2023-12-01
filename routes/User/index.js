@@ -38,7 +38,7 @@ router.delete("/order/:orderId", DeleteOrder);
 router.get("/home", GetInfo);
 router.post(
   "/request/:lat/:lng",
-  ImgUploader.fields([{ name: "images" }]),
+  ImgUploader.fields([{ name: "image" }]),
   AddItem
 );
 router.get("/archive", GetArchive);
