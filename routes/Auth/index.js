@@ -7,7 +7,8 @@ const {
   UpdatePassword,
   GetCitiesOrGove,
   GetCountries,
-  CompleteProfile
+  CompleteProfile,
+  GoogleLogin
 } = require("../../controllers/Auth");
 
 router.post("/login", Login);
@@ -18,4 +19,5 @@ router.post("/reset", UpdatePassword);
 router.get('/countries', GetCountries);
 router.post('/profile/complete/:id', CompleteProfile)
 router.get('/countries/:type/:country/:city', GetCitiesOrGove)
+router.post('/google', GoogleLogin);
 module.exports = router;

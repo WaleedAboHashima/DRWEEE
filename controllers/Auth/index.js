@@ -205,17 +205,20 @@ exports.GetCitiesOrGove = expressAsyncHandler(async (req, res) => {
             message: "Gove Retreived Successfully",
             governments: foundCity.Governments,
           });
-        }
-        else {
-          res.status(200).json({success: true, message: 'City not found', cities: []})
+        } else {
+          res
+            .status(200)
+            .json({ success: true, message: "City not found", cities: [] });
         }
       } else {
         res.status(200).json({ success: true, message: "invalid type" });
       }
     } else {
-      res
-        .status(200)
-        .json({ success: true, message: "No country with this name found", cities: []});
+      res.status(200).json({
+        success: true,
+        message: "No country with this name found",
+        cities: [],
+      });
     }
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -240,5 +243,24 @@ exports.CompleteProfile = expressAsyncHandler(async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+exports.GoogleLogin = expressAsyncHandler(async (req, res) => {
+  try {
+    const { email, fullName, accessToken } = req.body;
+    const client = await User.findOne({ email });
+    if (client) {
+      res.status(200).json({ success: true, message: "LoginSuccess", client });
+    } else {
+      const newClient = User.create({
+        fullName,
+        email,
+        phone: "",
+        password: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
