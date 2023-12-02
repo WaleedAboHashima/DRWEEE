@@ -435,13 +435,14 @@ exports.UpdateCart = expressAsyncHandler(async (req, res) => {
 });
 
 exports.AddItem = expressAsyncHandler(async (req, res) => {
-  const { name, description, quantity, image } = req.body;
+  const { name, description, quantity } = req.body;
   const userId = req.user.id;
   const { lat, lng } = req.params;
-  // const { image } = req.files;
+  const { image } = req.files;
   try {
+    console.log(image);
     if (image) {
-      const uploadedImage = (await cloudinary.uploader.upload(image))
+      const uploadedImage = (await cloudinary.uploader.upload(image[0]))
         .secure_url;
       await Requests.create({
         User: userId,
