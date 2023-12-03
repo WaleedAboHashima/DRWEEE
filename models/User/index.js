@@ -35,7 +35,6 @@ const userScehma = new mongoose.Schema({
   },
   phone: {
     type: "Number",
-    required: true,
     unique: true,
   },
   permission: {

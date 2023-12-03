@@ -5,7 +5,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const { SendOTP, VerifyOTP } = require("../../config/OTP");
 const jwt = require("jsonwebtoken");
 const { Rules } = require("./../../models/Rule");
-
+const googleRegex = /^ya29\.[A-Za-z\d_-]+$/;
 exports.Login = expressAsyncHandler(async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -43,7 +43,7 @@ exports.Login = expressAsyncHandler(async (req, res) => {
 
 exports.Register = expressAsyncHandler(async (req, res) => {
   const { fullName, email, password, phone, type } = req.body;
-  if (!email || !fullName || !password || !phone)
+  if (!email || !fullName || !password)
     return res
       .status(200)
       .json({ success: false, message: "All Fields Are Required" });
@@ -61,7 +61,7 @@ exports.Register = expressAsyncHandler(async (req, res) => {
           fullName,
           email,
           password: newPassword,
-          phone,
+          phone: phone && phone,
           role: type === "merchant" ? "Merchant" : "User",
         }).then((user) =>
           res
@@ -249,16 +249,24 @@ exports.CompleteProfile = expressAsyncHandler(async (req, res) => {
 exports.GoogleLogin = expressAsyncHandler(async (req, res) => {
   try {
     const { email, fullName, accessToken } = req.body;
+    if (!email || !fullName || !accessToken)
+      return res
+        .status(200)
+        .json({ success: false, message: "All fields are required" });
     const client = await User.findOne({ email });
-    if (client) {
+    if (client && googleRegex.test(accessToken)) {
       res.status(200).json({ success: true, message: "LoginSuccess", client });
-    } else {
-      const newClient = User.create({
+    } else if (!client && googleRegex.test(accessToken)) {
+      const newClient = await User.create({
         fullName,
         email,
-        phone: "",
         password: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
       });
+      res
+        .status(200)
+        .json({ success: true, message: "LoginSuccess", user: newClient });
+    } else {
+      res.status(200).json({ success: false, message: "Invalid access token" });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
