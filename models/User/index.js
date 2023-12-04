@@ -37,8 +37,8 @@ const userScehma = new mongoose.Schema({
     default: "User",
   },
   phone: {
-    type: "Number",
-    unique: true,
+    type: Number,
+    // unique: true,
   },
   permission: {
     type: String,
