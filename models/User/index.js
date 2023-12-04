@@ -2,9 +2,12 @@ const mongoose = require("mongoose");
 
 const userScehma = new mongoose.Schema({
   fullName: {
-    type: "String",
+    type: String,
     required: true,
     min: 3,
+  },
+  Image: {
+    type: String,
   },
   Admin: {
     type: mongoose.Schema.Types.ObjectId,

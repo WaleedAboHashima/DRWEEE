@@ -248,16 +248,22 @@ exports.CompleteProfile = expressAsyncHandler(async (req, res) => {
 
 exports.GoogleLogin = expressAsyncHandler(async (req, res) => {
   try {
-    const { email, fullName, accessToken } = req.body;
+    const { email, fullName, accessToken, image } = req.body;
     if (!email || !fullName || !accessToken)
       return res
         .status(200)
         .json({ success: false, message: "All fields are required" });
     const client = await User.findOne({ email });
     if (client && googleRegex.test(accessToken)) {
-      res.status(200).json({ success: true, message: "LoginSuccess", client });
+      const token = jwt.sign(
+        { id: client.id, role: client.role, email: client.email },
+        process.env.TOKEN,
+        { expiresIn: "30d" }
+      );
+      res.status(200).json({ success: true, message: "LoginSuccess", client, token });
     } else if (!client && googleRegex.test(accessToken)) {
       const newClient = await User.create({
+        Image: image,
         fullName,
         email,
         password: Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
