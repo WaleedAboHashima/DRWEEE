@@ -440,7 +440,6 @@ exports.AddItem = expressAsyncHandler(async (req, res) => {
   const { lat, lng } = req.params;
   const { image } = req.files;
   try {
-    console.log(image);
     if (image) {
       const uploadedImage = (await cloudinary.uploader.upload(image[0]))
         .secure_url;
