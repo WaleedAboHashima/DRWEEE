@@ -264,12 +264,21 @@ exports.GoogleLogin = expressAsyncHandler(async (req, res) => {
         .status(200)
         .json({ success: true, message: "LoginSuccess", user: client, token });
     } else if (!client && googleRegex.test(accessToken)) {
-      const password = await bcrypt.hash(Math.floor((Math.random() * (999999 - 100000 + 1)) + 100000).toString(), 10)
+      const password = await bcrypt.hash(
+        Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString(),
+        10
+      );
       const newClient = await User.create({
         Image: image,
         fullName,
         email,
-        password: 0o0000000000,
+        phone: Math.floor(
+          (
+            Math.random() * (99999999999 - 1000000000 + 1) +
+            1000000000
+          ).toString(),
+          10
+        ),
         password,
       });
       const token = jwt.sign(
@@ -277,9 +286,12 @@ exports.GoogleLogin = expressAsyncHandler(async (req, res) => {
         process.env.TOKEN,
         { expiresIn: "30d" }
       );
-      res
-        .status(200)
-        .json({ success: true, message: "LoginSuccess", user: newClient, token });
+      res.status(200).json({
+        success: true,
+        message: "LoginSuccess",
+        user: newClient,
+        token,
+      });
     } else {
       res.status(200).json({ success: false, message: "Invalid access token" });
     }
